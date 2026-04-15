@@ -16,17 +16,16 @@ export const fetchVideoInfo = async (url: string): Promise<VideoInfo> => {
 };
 
 export const downloadVideo = async (url: string, title: string) => {
-  const response = await axios.post(`${API_BASE_URL}/download`, { url }, {
-    responseType: 'blob',
-  });
+  const response = await axios.post(`${API_BASE_URL}/download`, { url });
+  const { downloadUrl } = response.data;
   
-  const blob = new Blob([response.data], { type: 'video/mp4' });
-  const downloadUrl = window.URL.createObjectURL(blob);
+  // The downloadUrl is relative to the backend base URL
+  const fullUrl = `${API_BASE_URL}${downloadUrl}`;
+  
   const link = document.createElement('a');
-  link.href = downloadUrl;
+  link.href = fullUrl;
   link.setAttribute('download', `${title}.mp4`);
   document.body.appendChild(link);
   link.click();
   link.remove();
-  window.URL.revokeObjectURL(downloadUrl);
 };
