@@ -1,6 +1,7 @@
 import os
 import uuid
 import yt_dlp
+import tempfile
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -12,13 +13,14 @@ app = FastAPI()
 # CORS settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For development, allow all. Change this for production.
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-DOWNLOAD_DIR = "downloads"
+# Use /tmp for serverless environments (like Vercel)
+DOWNLOAD_DIR = os.path.join(tempfile.gettempdir(), "ytdownloader_downloads")
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 class VideoRequest(BaseModel):
